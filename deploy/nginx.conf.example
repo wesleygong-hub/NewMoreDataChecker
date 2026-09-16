@@ -97,7 +97,7 @@ server {
     }
 
     location @login_redirect {
-        return 302 /login.html?next=$request_uri;
+        return 302 https://106.14.220.108:8443/login.html?next=$request_uri;
     }
 
     location = /index.html {
