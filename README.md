@@ -95,21 +95,21 @@ npm run build
 
 ## 部署到阿里云轻量应用服务器
 
-这个应用只需要静态网站服务，不需要数据库、Node.js 常驻进程或后端接口。
+生产环境由 Nginx 提供静态资源，并通过独立的轻量认证服务保护整个应用。认证服务仅处理用户名、密码摘要和登录会话，不接收 Excel 文件，也不需要数据库或 Node.js 常驻进程。
 
 1. 在本地执行 `npm ci` 和 `npm run build`。
-2. 将 `dist/` 目录内的文件上传到服务器，例如 `/var/www/data-checker/`。
-3. 参考 [Nginx 配置示例](deploy/nginx.conf.example) 配置站点根目录。
-4. 检查 Nginx 配置并重载服务。
-5. 建议为正式域名配置 HTTPS。
+2. 使用 `deploy/generate_user.py` 在安全目录生成用户密码摘要和会话密钥；明文密码不得写入配置或提交 Git。
+3. 将 `dist/` 和 `deploy/auth_server.py` 发布到独立版本目录。
+4. 参考 [认证服务配置](deploy/newmore-datachecker-auth.service.example)、[环境变量示例](deploy/auth.env.example) 和 [Nginx 配置示例](deploy/nginx.conf.example) 启动认证保护。
+5. 检查认证服务健康状态、Nginx 配置与 HTTPS 登录流程后再开放访问。
 
-即使部署到公网服务器，用户选择的 Excel 仍只在当前浏览器内处理；服务器只提供 HTML、CSS、JavaScript 等静态文件。
+即使部署到公网服务器，用户选择的 Excel 仍只在当前浏览器内处理；服务器只保存登录账号的加盐密码摘要和短期会话信息，不会接收、保存或处理账单文件。
 
 ## 仓库结构
 
 - `src/`：Web 2.0 应用源码。
 - `delphi/`：Delphi 1.0 桌面版归档。
 - `docs/releases/`：正式版本发布说明。
-- `deploy/`：静态部署配置示例。
+- `deploy/`：静态资源、认证服务和 Nginx 部署配置示例。
 
 真实账单、核对导出文件、本地依赖和构建产物均不会提交到仓库。

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>登录 · 牛马对账</title>
+    <link rel="stylesheet" href="/login.css" />
+  </head>
+  <body>
+    <div class="login-shell">
+      <header class="login-header">
+        <div class="login-brand">
+          <span class="login-brand-logo"><img src="/login-logo.png" alt="" /></span>
+          <span><strong>牛马对账</strong><small>速创 · 聚合力账单核对</small></span>
+        </div>
+        <span class="secure-badge" aria-label="安全访问">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.7 2.8 8.2 7 10 4.2-1.8 7-5.3 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
+          安全访问
+        </span>
+      </header>
+
+      <main class="login-main">
+        <section class="login-panel" aria-labelledby="login-title">
+          <div class="login-story">
+            <span class="story-orb story-orb-one"></span>
+            <span class="story-orb story-orb-two"></span>
+            <img src="/login-logo.png" alt="牛马对账" class="story-logo" />
+            <h1>今天的账，<br />也要对得明明白白</h1>
+            <div class="story-underline"></div>
+            <p>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.7 2.8 8.2 7 10 4.2-1.8 7-5.3 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
+              账单文件仍只在本机浏览器中处理
+            </p>
+          </div>
+
+          <div class="login-form-wrap">
+            <form id="login-form" class="login-form" autocomplete="on">
+              <div class="login-title-block">
+                <h2 id="login-title">欢迎回来</h2>
+                <p>登录后开始账单核对</p>
+              </div>
+
+              <label for="username">用户名</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+                <input id="username" name="username" type="text" autocomplete="username" placeholder="请输入用户名" maxlength="64" required autofocus />
+              </div>
+
+              <label for="password">密码</label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="请输入密码" maxlength="256" required />
+                <button id="toggle-password" class="password-toggle" type="button" aria-label="显示密码" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                </button>
+              </div>
+
+              <label class="remember-row" for="remember-username">
+                <input id="remember-username" type="checkbox" />
+                <span>记住用户名</span>
+              </label>
+
+              <p id="login-message" class="login-message" role="alert" aria-live="polite" hidden></p>
+
+              <button id="login-submit" class="login-submit" type="submit">
+                <span class="submit-spinner" aria-hidden="true"></span>
+                <span class="submit-label">登录并开始核对</span>
+              </button>
+
+              <div class="authorized-note"><span></span>仅限授权用户使用<span></span></div>
+              <small class="login-version">v2.1.0</small>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/login.js" defer></script>
+  </body>
+</html>

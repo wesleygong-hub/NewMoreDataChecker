@@ -1,25 +1,121 @@
-server {
-    listen 80;
-    server_name example.com;
+limit_req_zone $binary_remote_addr zone=newmore_login:10m rate=5r/m;
 
-    root /var/www/data-checker;
+upstream newmore_auth_backend {
+    server 172.17.0.1:18080;
+    keepalive 8;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name 106.14.220.108;
+
+    root /srv/newmore-datachecker/current;
     index index.html;
+    server_tokens off;
+
+    ssl_certificate /etc/nginx/tls/server.crt;
+    ssl_certificate_key /etc/nginx/tls/server.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:NEWMORE_SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_session_tickets off;
+
+    limit_req_status 429;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "no-referrer" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'" always;
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+
+    location = /login.html {
+        expires -1;
+        try_files $uri =404;
+    }
+
+    location = /login.css {
+        expires 1h;
+        try_files $uri =404;
+    }
+
+    location = /login.js {
+        expires 1h;
+        try_files $uri =404;
+    }
+
+    location = /login-logo.png {
+        expires 1h;
+        try_files $uri =404;
+    }
+
+    location = /api/login {
+        limit_req zone=newmore_login burst=5 nodelay;
+        client_max_body_size 8k;
+        proxy_pass http://newmore_auth_backend/login;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header Origin $http_origin;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 5s;
+    }
+
+    location = /api/logout {
+        proxy_pass http://newmore_auth_backend/logout;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header Origin $http_origin;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 5s;
+    }
+
+    location = /api/session {
+        proxy_pass http://newmore_auth_backend/verify;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Cookie $http_cookie;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 5s;
+    }
+
+    location = /_auth_verify {
+        internal;
+        proxy_pass http://newmore_auth_backend/verify;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Cookie $http_cookie;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 5s;
+    }
+
+    location @login_redirect {
+        return 302 /login.html?next=$request_uri;
+    }
 
     location = /index.html {
+        auth_request /_auth_verify;
+        error_page 401 = @login_redirect;
         expires -1;
+        try_files $uri =404;
     }
 
     location / {
+        auth_request /_auth_verify;
+        error_page 401 = @login_redirect;
         try_files $uri $uri/ /index.html;
     }
 
     location ~* \.(?:js|css|woff2?|png|svg|ico)$ {
+        auth_request /_auth_verify;
+        error_page 401 = @login_redirect;
         expires 7d;
         try_files $uri =404;
     }
-
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer" always;
-    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'" always;
 }

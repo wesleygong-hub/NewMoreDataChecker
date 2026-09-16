@@ -39,8 +39,14 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .brand strong { color: var(--brand-navy); font-size: 18px; font-weight: 700; letter-spacing: .04em; }
 .brand small, .privacy-note { color: var(--muted); font-size: 12px; }
 .brand small { color: var(--brand-green); }
+.header-actions { display: flex; align-items: center; gap: 10px; }
 .privacy-note { display: flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid #dceae2; border-radius: 999px; background: #f5faf7; }
 .privacy-note svg { width: 17px; height: 17px; color: var(--brand-green); }
+.logout-button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border: 1px solid #d6e1dd; border-radius: 999px; color: var(--brand-navy); background: #fff; font-size: 12px; cursor: pointer; transition: border-color .15s ease, color .15s ease, background .15s ease; }
+.logout-button svg { width: 16px; height: 16px; }
+.logout-button:hover { border-color: #9fc5ba; color: var(--brand-green-dark); background: #f5faf7; }
+.logout-button:focus-visible { outline: 3px solid rgba(17, 120, 61, .16); outline-offset: 2px; }
+.logout-button:disabled { opacity: .65; cursor: wait; }
 
 main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 36px; }
 .hero { width: min(900px, 100%); margin: 0 auto; }
@@ -175,6 +181,8 @@ footer { display: flex; align-items: center; justify-content: center; flex-wrap:
   .brand-logo { width: 42px; height: 42px; border-radius: 12px; }
   .brand strong { font-size: 16px; }
   .privacy-note { display: none; }
+  .header-actions { gap: 0; }
+  .logout-button { padding: 7px 10px; }
   main { width: min(100% - 24px, 1080px); padding-top: 24px; }
   .hero-layout { grid-template-columns: 1fr; gap: 0; padding: 12px 22px 26px; text-align: center; }
   .hero-logo { width: 190px; margin: -15px auto -24px; }

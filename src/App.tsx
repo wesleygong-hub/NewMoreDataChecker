@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import packageInfo from "../package.json";
 import niumaLogo from "./assets/niuma-reconcile-logo.png";
 import type {
   ImportIssue,
@@ -17,6 +18,8 @@ type Phase = "idle" | "running" | "done" | "error";
 type ViewFilter = "all" | ReconciliationStatus | "issues";
 
 const PAGE_SIZE = 50;
+const AUTH_ENABLED = import.meta.env.VITE_AUTH_ENABLED === "true";
+const APP_VERSION = `v${packageInfo.version}`;
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -66,6 +69,15 @@ function RefreshIcon() {
     <Icon>
       <path d="M20 7v5h-5M4 17v-5h5" />
       <path d="M6.1 8a7 7 0 0 1 11.7-2L20 8M4 16l2.2 2a7 7 0 0 0 11.7-2" />
+    </Icon>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <Icon>
+      <path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
+      <path d="m15 8 4 4-4 4M9 12h10" />
     </Icon>
   );
 }
@@ -219,6 +231,7 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
   const exportWorkerRef = useRef<Worker | null>(null);
   const [quoteIndex, setQuoteIndex] = useState(() => randomQuoteIndex());
 
@@ -376,6 +389,23 @@ export default function App() {
     }
   }
 
+  async function handleLogout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("logout failed");
+      window.location.replace("/login.html?loggedOut=1");
+    } catch {
+      window.alert("退出登录失败，请稍后重试。");
+      setLoggingOut(false);
+    }
+  }
+
   const canRun = scFiles.length === 1 && hrallyFiles.length > 0 && phase !== "running";
 
   return (
@@ -385,7 +415,14 @@ export default function App() {
           <span className="brand-logo"><img src={niumaLogo} alt="" /></span>
           <span><strong>牛马对账</strong><small>速创 · 聚合力账单核对</small></span>
         </div>
-        <span className="privacy-note"><ShieldIcon />文件仅在本机浏览器中处理</span>
+        <div className="header-actions">
+          <span className="privacy-note"><ShieldIcon />文件仅在本机浏览器中处理</span>
+          {AUTH_ENABLED && (
+            <button className="logout-button" type="button" disabled={loggingOut} onClick={handleLogout}>
+              <LogoutIcon />{loggingOut ? "正在退出" : "退出登录"}
+            </button>
+          )}
+        </div>
       </header>
 
       <main>
@@ -523,7 +560,7 @@ export default function App() {
 
       <footer>
         <span>牛马对账 · 纯浏览器核对 · 无数据库 · 无服务端上传</span>
-        <span className="version-badge" aria-label="当前版本 v2.0.0">v2.0.0</span>
+        <span className="version-badge" aria-label={`当前版本 ${APP_VERSION}`}>{APP_VERSION}</span>
       </footer>
     </div>
   );
