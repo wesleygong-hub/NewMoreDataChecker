@@ -13,6 +13,7 @@ server {
     root /srv/newmore-datachecker/current;
     index index.html;
     server_tokens off;
+    absolute_redirect off;
 
     ssl_certificate /etc/nginx/tls/server.crt;
     ssl_certificate_key /etc/nginx/tls/server.key;
